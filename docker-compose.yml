@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: local
+      args:
+        USERID: ${USERID:-1000}
+        GROUPID: ${GROUPID:-1000}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fillament-demo.rule=Host(`reworck.test`)"
+      - "traefik.http.routers.fillament-demo.tls=true"
+      - "traefik.http.routers.fillament-demo.entrypoints=web-secure"
+      - "traefik.http.services.fillament-demo.loadbalancer.server.port=80"
+    environment:
+      XDEBUG_CONFIG: idekey=PHPSTORM
+      PHP_IDE_CONFIG: serverName=reworck.test
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - .:/www:delegated
+
+networks:
+  default:
+    name: reworck-website
